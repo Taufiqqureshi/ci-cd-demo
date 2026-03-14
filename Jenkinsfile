@@ -27,3 +27,25 @@ pipeline {
 		}
 	}
 }
+
+post {
+    	success {
+            script {
+                // Notify success to Slack
+                slackSend channel: '#spark-alerts', color: 'good', message: "Build SUCCESSFUL: ${env.JOB_NAME} [${env.BUILD_NUMBER}] (${env.BUILD_URL})"
+            }
+        }
+        failure {
+            script {
+                // Notify failure to Slack
+                slackSend channel: '#spark-alerts', color: 'danger', message: "Build FAILED: ${env.JOB_NAME} [${env.BUILD_NUMBER}] (${env.BUILD_URL})"
+            }
+        }
+        always {
+            script {
+                // Stop and remove containers after the job
+                sh 'docker-compose down'
+            }
+        }
+    }
+}
